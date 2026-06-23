@@ -1,0 +1,101 @@
+{% extends "admin_base.html" %}
+{% block title %}Agendamentos{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+  <h1>Agendamentos</h1>
+  <form method="GET" class="date-picker-form">
+    <input type="date" name="data" value="{{ dia_filtro.strftime('%Y-%m-%d') }}" onchange="this.form.submit()">
+    <select name="barbeiro_id" onchange="this.form.submit()">
+      <option value="">Todos os barbeiros</option>
+      {% for b in barbeiros %}
+      <option value="{{ b.id }}" {% if barbeiro_filtro_id == b.id %}selected{% endif %}>{{ b.nome }}</option>
+      {% endfor %}
+    </select>
+  </form>
+</div>
+
+<div class="admin-cards">
+  <div class="admin-card">
+    <strong>{{ total_hoje }}</strong>
+    <span>Agendamentos no dia {{ dia_filtro.strftime('%d/%m') }}</span>
+  </div>
+  <div class="admin-card">
+    <strong>{{ confirmados }}</strong>
+    <span>Confirmados</span>
+  </div>
+  <div class="admin-card">
+    <strong>{{ total_hoje - confirmados }}</strong>
+    <span>Cancelados</span>
+  </div>
+</div>
+
+{% if proximos %}
+<div class="lista-proximos">
+  <h2>Próximos agendamentos</h2>
+  {% for p in proximos %}
+  <div class="proximo-item">
+    <span><span class="data-pill">{{ p.data_fmt }} · {{ p.hora }}</span>{{ p.cliente_nome }} — {{ p.servico_nome }} com {{ p.barbeiro_nome }}</span>
+    <span style="color: var(--texto-mudo);">{{ p.cliente_telefone }}</span>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="tabela-wrap">
+  {% if agendamentos %}
+  <table>
+    <thead>
+      <tr>
+        <th>Horário</th>
+        <th>Cliente</th>
+        <th>Telefone</th>
+        <th>Serviço</th>
+        <th>Barbeiro</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ag in agendamentos %}
+      <tr class="{{ 'cancelado' if ag.status == 'cancelado' else '' }}">
+        <td><strong>{{ ag.hora }}</strong></td>
+        <td>{{ ag.cliente_nome }}</td>
+        <td>{{ ag.cliente_telefone }}</td>
+        <td>{{ ag.servico_nome }}{% if ag.observacoes %} <span title="{{ ag.observacoes }}" style="color:var(--dourado-claro); cursor:help;">📝</span>{% endif %}</td>
+        <td>{{ ag.barbeiro_nome }}</td>
+        <td>
+          {% if ag.status == 'confirmado' %}
+            <span class="badge badge-confirmado">Confirmado</span>
+          {% else %}
+            <span class="badge badge-cancelado">Cancelado</span>
+          {% endif %}
+        </td>
+        <td>
+          <div class="acoes-tabela">
+            {% if ag.status == 'confirmado' %}
+            <form method="POST" action="{{ url_for('admin_cancelar', agendamento_id=ag.id) }}">
+              <button class="btn-mini btn-mini-cancelar" type="submit">Cancelar</button>
+            </form>
+            {% else %}
+            <form method="POST" action="{{ url_for('admin_reativar', agendamento_id=ag.id) }}">
+              <button class="btn-mini btn-mini-reativar" type="submit">Reativar</button>
+            </form>
+            {% endif %}
+            <form method="POST" action="{{ url_for('admin_excluir', agendamento_id=ag.id) }}" onsubmit="return confirm('Excluir este agendamento permanentemente?');">
+              <button class="btn-mini btn-mini-excluir" type="submit">Excluir</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="estado-vazio">
+    <div class="icon">📭</div>
+    <p>Nenhum agendamento para essa data.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

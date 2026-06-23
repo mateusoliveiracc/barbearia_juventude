@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Admin — {{ empresa.nome }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <div class="login-shell">
+      <div class="brand" style="justify-content:center; margin-bottom: 20px;">
+        <span class="brand-icon">💈</span> {{ empresa.nome }}
+      </div>
+      <h1>Painel Administrativo</h1>
+      <p class="subtitulo">Acesso restrito à equipe</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for categoria, msg in messages %}
+            <div class="flash flash-error">{{ msg }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST">
+        <div class="form-grupo">
+          <label for="usuario">Usuário</label>
+          <input type="text" id="usuario" name="usuario" placeholder="admin" required autofocus>
+        </div>
+        <div class="form-grupo">
+          <label for="senha">Senha</label>
+          <input type="password" id="senha" name="senha" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-enviar">Entrar</button>
+      </form>
+
+      <p style="text-align:center; margin-top: 20px;">
+        <a href="{{ url_for('index') }}" style="color: var(--texto-mudo); font-size: 0.85rem;">← Voltar para o site</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

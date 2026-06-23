@@ -1,0 +1,18 @@
+{% extends "admin_base.html" %}
+{% block title %}Novo barbeiro{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+  <h1>Novo barbeiro</h1>
+</div>
+
+<div class="form-shell" style="margin: 0;">
+  <form method="POST">
+    <div class="form-grupo">
+      <label for="nome">Nome do barbeiro *</label>
+      <input type="text" id="nome" name="nome" placeholder="Ex: Haylander Heiderich" required autofocus>
+    </div>
+    <button type="submit" class="btn-enviar">Salvar barbeiro</button>
+  </form>
+</div>
+{% endblock %}

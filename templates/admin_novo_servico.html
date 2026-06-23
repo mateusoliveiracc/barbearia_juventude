@@ -1,0 +1,28 @@
+{% extends "admin_base.html" %}
+{% block title %}Novo serviço{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+  <h1>Novo serviço</h1>
+</div>
+
+<div class="form-shell" style="margin: 0;">
+  <form method="POST">
+    <div class="form-grupo">
+      <label for="nome">Nome do serviço *</label>
+      <input type="text" id="nome" name="nome" placeholder="Ex: Corte e Barba" required>
+    </div>
+    <div class="form-row">
+      <div class="form-grupo">
+        <label for="preco_texto">Preço (texto livre) *</label>
+        <input type="text" id="preco_texto" name="preco_texto" placeholder="Ex: R$ 35,00 ou Consultar" required>
+      </div>
+      <div class="form-grupo">
+        <label for="duracao_min">Duração (minutos) *</label>
+        <input type="text" id="duracao_min" name="duracao_min" placeholder="40" required>
+      </div>
+    </div>
+    <button type="submit" class="btn-enviar">Salvar serviço</button>
+  </form>
+</div>
+{% endblock %}

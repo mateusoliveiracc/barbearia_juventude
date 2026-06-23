@@ -1,0 +1,51 @@
+{% extends "admin_base.html" %}
+{% block title %}Serviços{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+  <h1>Serviços</h1>
+  <a href="{{ url_for('admin_novo_servico') }}" class="btn-novo-servico">+ Novo serviço</a>
+</div>
+
+<div class="tabela-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Serviço</th>
+        <th>Preço</th>
+        <th>Duração</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in servicos %}
+      <tr>
+        <td><strong>{{ s.nome }}</strong></td>
+        <td>{{ s.preco_texto }}</td>
+        <td>{{ s.duracao_min }} min</td>
+        <td>
+          {% if s.ativo %}
+            <span class="badge badge-confirmado">Ativo</span>
+          {% else %}
+            <span class="badge badge-cancelado">Inativo</span>
+          {% endif %}
+        </td>
+        <td>
+          <div class="acoes-tabela">
+            <form method="POST" action="{{ url_for('admin_toggle_servico', servico_id=s.id) }}">
+              <button class="btn-mini {{ 'btn-mini-cancelar' if s.ativo else 'btn-mini-reativar' }}" type="submit">
+                {{ 'Desativar' if s.ativo else 'Ativar' }}
+              </button>
+            </form>
+            <form method="POST" action="{{ url_for('admin_excluir_servico', servico_id=s.id) }}" onsubmit="return confirm('Excluir este serviço?');">
+              <button class="btn-mini btn-mini-excluir" type="submit">Excluir</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

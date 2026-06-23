@@ -1,0 +1,54 @@
+{% extends "admin_base.html" %}
+{% block title %}Barbeiros{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+  <h1>Barbeiros</h1>
+  <a href="{{ url_for('admin_novo_barbeiro') }}" class="btn-novo-servico">+ Novo barbeiro</a>
+</div>
+
+<div class="tabela-wrap">
+  {% if barbeiros %}
+  <table>
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in barbeiros %}
+      <tr>
+        <td><strong>{{ b.nome }}</strong></td>
+        <td>
+          {% if b.ativo %}
+            <span class="badge badge-confirmado">Ativo</span>
+          {% else %}
+            <span class="badge badge-cancelado">Inativo</span>
+          {% endif %}
+        </td>
+        <td>
+          <div class="acoes-tabela">
+            <form method="POST" action="{{ url_for('admin_toggle_barbeiro', barbeiro_id=b.id) }}">
+              <button class="btn-mini {{ 'btn-mini-cancelar' if b.ativo else 'btn-mini-reativar' }}" type="submit">
+                {{ 'Desativar' if b.ativo else 'Ativar' }}
+              </button>
+            </form>
+            <form method="POST" action="{{ url_for('admin_excluir_barbeiro', barbeiro_id=b.id) }}" onsubmit="return confirm('Excluir este barbeiro?');">
+              <button class="btn-mini btn-mini-excluir" type="submit">Excluir</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="estado-vazio">
+    <div class="icon">✂️</div>
+    <p>Nenhum barbeiro cadastrado ainda.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Agendamento confirmado — {{ empresa.nome }}{% endblock %}
+
+{% block content %}
+<section>
+  <div class="container">
+    <div class="confirmacao-shell">
+      <div class="confirmacao-icon">✅</div>
+      <h1>Horário confirmado!</h1>
+      <p style="color: var(--texto-mudo);">Te esperamos na {{ empresa.nome }}.</p>
+
+      <div class="confirmacao-detalhes">
+        <div><span>Cliente</span><span>{{ ag.cliente_nome }}</span></div>
+        <div><span>Serviço</span><span>{{ ag.servico_nome }}</span></div>
+        <div><span>Barbeiro</span><span>{{ ag.barbeiro_nome }}</span></div>
+        <div><span>Data</span><span>{{ data_formatada }}</span></div>
+        <div><span>Horário</span><span>{{ ag.hora }}</span></div>
+        <div><span>Telefone</span><span>{{ ag.cliente_telefone }}</span></div>
+      </div>
+
+      <p style="font-size:0.85rem; color: var(--texto-mudo); margin-bottom: 24px;">
+        Em caso de imprevisto, ligue para {{ empresa.telefone }} para reagendar ou cancelar.
+      </p>
+
+      <a href="{{ url_for('index') }}" class="btn-secundario">Voltar para o início</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

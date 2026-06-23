@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block title %}{{ empresa.nome }} — Agende seu horário{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <span class="hero-badge">⭐ {{ empresa.nota }} de avaliação dos clientes</span>
+      <h1>Estilo e <span>precisão</span><br>em cada corte.</h1>
+      <p>
+        Na {{ empresa.nome }} você agenda online em poucos cliques e garante
+        seu horário com os melhores profissionais de Santa Luzia/MG.
+      </p>
+      <div class="hero-actions">
+        <a href="{{ url_for('agendar') }}" class="btn-primario">📅 Agendar agora</a>
+        <a href="#servicos" class="btn-secundario">Ver serviços</a>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <strong>{{ servicos|length }}+</strong>
+          <span>Serviços disponíveis</span>
+        </div>
+        <div>
+          <strong>{{ empresa.nota }}</strong>
+          <span>Nota dos clientes</span>
+        </div>
+        <div>
+          <strong>6 dias</strong>
+          <span>Por semana</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-visual-icon">💈</div>
+      <div class="hero-visual-card">
+        <strong>Próximo horário disponível</strong>
+        <span>Agende online e escolha o melhor dia para você</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="servicos">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">O que fazemos</span>
+      <h2>Nossos serviços</h2>
+      <p>Escolha o serviço desejado e agende o horário que for melhor para você.</p>
+    </div>
+
+    <div class="servicos-grid">
+      {% for s in servicos %}
+      <div class="servico-card">
+        <h3>{{ s.nome }}</h3>
+        <div class="servico-meta">
+          <span class="servico-preco">
+            {% if 'A partir de' in s.preco_texto %}<small>A partir de</small>{{ s.preco_texto.replace('A partir de ', '') }}
+            {% else %}{{ s.preco_texto }}{% endif %}
+          </span>
+          <span class="servico-duracao">⏱ {{ s.duracao_min }} min</span>
+        </div>
+        <a href="{{ url_for('agendar', servico_id=s.id) }}" class="btn-servico">Agendar</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section id="comodidades">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Estrutura</span>
+      <h2>Comodidades</h2>
+    </div>
+    <div class="comodidades-grid">
+      <div class="comodidade-card">
+        <div class="comodidade-icon">📶</div>
+        <strong>Wi-fi</strong>
+        <p>Internet grátis para clientes</p>
+      </div>
+      <div class="comodidade-card">
+        <div class="comodidade-icon">🅿️</div>
+        <strong>Estacionamento</strong>
+        <p>Vaga fácil na região</p>
+      </div>
+      <div class="comodidade-card">
+        <div class="comodidade-icon">♿</div>
+        <strong>Acessibilidade</strong>
+        <p>Espaço acessível</p>
+      </div>
+      <div class="comodidade-card">
+        <div class="comodidade-icon">🧒</div>
+        <strong>Atende crianças</strong>
+        <p>Cortes para todas as idades</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="localizacao">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Visite-nos</span>
+      <h2>Localização &amp; horários</h2>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>📍 Endereço e contato</h3>
+        <p class="endereco-texto">{{ empresa.endereco }}</p>
+        <div class="contato-linha">📞 <a href="tel:+{{ empresa.telefone_link }}">{{ empresa.telefone }}</a></div>
+        <div class="contato-linha">📷 <a href="{{ empresa.instagram }}" target="_blank" rel="noopener">@barbearia_juventude</a></div>
+        <p style="margin-top:18px; color:var(--texto-mudo); font-size:0.85rem; font-weight:600;">Formas de pagamento</p>
+        <div class="pagamentos-tags">
+          {% for p in empresa.pagamentos %}
+          <span class="tag-pagamento">{{ p }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="info-card" id="horarios">
+        <h3>🕒 Horário de atendimento</h3>
+        {% for idx in range(7) %}
+          {% set cfg = horario[idx] %}
+          <div class="horario-linha">
+            <span>{{ dias_semana[idx] }}</span>
+            {% if cfg %}
+              <span>{{ cfg[0] }} - {{ cfg[1] }}</span>
+            {% else %}
+              <span class="horario-fechado">Fechado</span>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="cta-final" style="max-width: 700px;">
+      <h2>Pronto para renovar o visual?</h2>
+      <p>Reserve seu horário agora mesmo, é rápido e simples.</p>
+      <a href="{{ url_for('agendar') }}" class="btn-primario">📅 Agendar meu horário</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

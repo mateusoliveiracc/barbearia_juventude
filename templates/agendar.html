@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}Agendar horário — {{ empresa.nome }}{% endblock %}
+
+{% block content %}
+<section>
+  <div class="container">
+    <div class="form-shell">
+      <h1>Agendar horário</h1>
+      <p class="subtitulo">Escolha o serviço, o barbeiro, a data e o horário desejado.</p>
+
+      <form method="POST" id="form-agendamento">
+        <div class="form-row">
+          <div class="form-grupo">
+            <label for="nome">Nome completo *</label>
+            <input type="text" id="nome" name="nome" placeholder="Seu nome" value="{{ form.get('nome', '') }}" required>
+          </div>
+          <div class="form-grupo">
+            <label for="telefone">Telefone / WhatsApp *</label>
+            <input type="tel" id="telefone" name="telefone" placeholder="(31) 99999-9999" value="{{ form.get('telefone', '') }}" required>
+          </div>
+        </div>
+
+        <div class="form-grupo">
+          <label for="servico_id">Serviço *</label>
+          <select id="servico_id" name="servico_id" required>
+            <option value="">Selecione um serviço</option>
+            {% for s in servicos %}
+            <option value="{{ s.id }}" data-duracao="{{ s.duracao_min }}"
+              {% if servico_id_pre == s.id %}selected{% endif %}>
+              {{ s.nome }} — {{ s.preco_texto }} ({{ s.duracao_min }} min)
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-grupo">
+          <label for="barbeiro_id">Barbeiro *</label>
+          <select id="barbeiro_id" name="barbeiro_id" required>
+            <option value="">Selecione um barbeiro</option>
+            {% for b in barbeiros %}
+            <option value="{{ b.id }}" {% if form.get('barbeiro_id') == b.id|string %}selected{% endif %}>
+              {{ b.nome }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-grupo">
+          <label for="data">Data *</label>
+          <input type="date" id="data" name="data" required value="{{ form.get('data', '') }}">
+        </div>
+
+        <div class="form-grupo">
+          <label>Horário disponível *</label>
+          <div id="slots-container" class="slots-aviso">
+            Selecione o serviço e a data para ver os horários disponíveis.
+          </div>
+          <input type="hidden" id="hora" name="hora" value="{{ form.get('hora', '') }}">
+        </div>
+
+        <div class="form-grupo">
+          <label for="observacoes">Observações (opcional)</label>
+          <textarea id="observacoes" name="observacoes" placeholder="Algum detalhe que devemos saber?">{{ form.get('observacoes', '') }}</textarea>
+        </div>
+
+        <button type="submit" class="btn-enviar" id="btn-enviar" disabled>Confirmar agendamento</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const selectServico = document.getElementById('servico_id');
+  const selectBarbeiro = document.getElementById('barbeiro_id');
+  const inputData = document.getElementById('data');
+  const slotsContainer = document.getElementById('slots-container');
+  const inputHora = document.getElementById('hora');
+  const btnEnviar = document.getElementById('btn-enviar');
+
+  // não permitir datas passadas
+  const hoje = new Date();
+  const isoHoje = hoje.toISOString().split('T')[0];
+  inputData.setAttribute('min', isoHoje);
+
+  function atualizarBotaoEnviar() {
+    const ok = selectServico.value && selectBarbeiro.value && inputData.value && inputHora.value;
+    btnEnviar.disabled = !ok;
+  }
+
+  async function carregarHorarios() {
+    const servicoId = selectServico.value;
+    const barbeiroId = selectBarbeiro.value;
+    const data = inputData.value;
+    inputHora.value = '';
+    atualizarBotaoEnviar();
+
+    if (!servicoId || !barbeiroId || !data) {
+      slotsContainer.innerHTML = 'Selecione o serviço, o barbeiro e a data para ver os horários disponíveis.';
+      slotsContainer.className = 'slots-aviso';
+      return;
+    }
+
+    slotsContainer.innerHTML = 'Carregando horários...';
+    slotsContainer.className = 'slots-aviso';
+
+    try {
+      const resp = await fetch(`/api/horarios?servico_id=${servicoId}&barbeiro_id=${barbeiroId}&data=${data}`);
+      const json = await resp.json();
+
+      if (json.erro) {
+        slotsContainer.innerHTML = 'Não foi possível carregar os horários.';
+        return;
+      }
+
+      if (json.horarios.length === 0) {
+        slotsContainer.innerHTML = 'Nenhum horário disponível com esse barbeiro nessa data. Tente outro dia ou outro profissional.';
+        return;
+      }
+
+      const grid = document.createElement('div');
+      grid.className = 'slots-grid';
+
+      json.horarios.forEach(h => {
+        const btn = document.createElement('div');
+        btn.className = 'slot-btn';
+        btn.textContent = h;
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selecionado'));
+          btn.classList.add('selecionado');
+          inputHora.value = h;
+          atualizarBotaoEnviar();
+        });
+        grid.appendChild(btn);
+      });
+
+      slotsContainer.innerHTML = '';
+      slotsContainer.appendChild(grid);
+    } catch (e) {
+      slotsContainer.innerHTML = 'Erro ao carregar horários. Tente novamente.';
+    }
+  }
+
+  selectServico.addEventListener('change', carregarHorarios);
+  selectBarbeiro.addEventListener('change', carregarHorarios);
+  inputData.addEventListener('change', carregarHorarios);
+
+  // se vier pré-selecionado via URL, já carrega
+  if (selectServico.value) {
+    atualizarBotaoEnviar();
+  }
+</script>
+{% endblock %}

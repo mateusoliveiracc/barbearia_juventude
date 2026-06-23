@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ empresa.nome }}{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a href="{{ url_for('index') }}" class="brand">
+        <span class="brand-icon">💈</span>
+        {{ empresa.nome }}
+      </a>
+      <nav class="nav-links">
+        <a href="{{ url_for('index') }}#servicos">Serviços</a>
+        <a href="{{ url_for('index') }}#localizacao">Localização</a>
+        <a href="{{ url_for('index') }}#horarios">Horários</a>
+      </nav>
+      <a href="{{ url_for('agendar') }}" class="btn-agendar-top">Agendar horário</a>
+    </div>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="container" style="padding-top: 24px;">
+        {% for categoria, msg in messages %}
+          <div class="flash flash-{{ 'error' if categoria == 'error' else 'success' }}">{{ msg }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>© {{ 2026 }} {{ empresa.nome }} — Todos os direitos reservados.</p>
+      <p style="margin-top:6px;">
+        📍 {{ empresa.endereco }} &nbsp;|&nbsp;
+        📞 <a href="tel:+{{ empresa.telefone_link }}">{{ empresa.telefone }}</a> &nbsp;|&nbsp;
+        <a href="{{ empresa.instagram }}" target="_blank" rel="noopener">Instagram</a>
+      </p>
+    </div>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>
