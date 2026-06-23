@@ -472,18 +472,20 @@ def api_horarios():
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
-        usuario = request.form.get("usuario", "").strip()
-        senha = request.form.get("senha", "")
+        usuario = request.form["usuario"]
+        senha = request.form["senha"]
 
         db = get_db()
-        admin = db.execute("SELECT * FROM admin WHERE usuario = ?", (usuario,)).fetchone()
+        admin = db.execute(
+            "SELECT * FROM admin WHERE usuario = ?",
+            (usuario,)
+        ).fetchone()
 
         if admin and check_password_hash(admin["senha_hash"], senha):
             session["admin_id"] = admin["id"]
-            session["admin_usuario"] = admin["usuario"]
             return redirect(url_for("admin_dashboard"))
 
-        flash("Usuário ou senha incorretos.", "error")
+        flash("Usuário ou senha inválidos", "error")
 
     return render_template("admin_login.html", empresa=EMPRESA)
 
