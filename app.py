@@ -60,7 +60,7 @@ EMPRESA = {
 }
 
 ADMIN_USER_PADRAO = os.environ.get("ADMIN_USER", "admin")
-ADMIN_PASS_PADRAO = os.environ.get("ADMIN_PASS", "barbearia123")
+ADMIN_PASS_PADRAO = os.environ.get("ADMIN_PASS", "barbearia2013")
 
 SERVICOS_INICIAIS = [
     ("Corte", "R$ 35,00", 40),
